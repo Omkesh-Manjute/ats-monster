@@ -6,6 +6,7 @@ export interface Candidate {
   skills: string;
   experience: string;
   content: string;
-  fileName: string;
-  uploadedAt: string;
+  matchScore?: number;
+  matchedSkills?: string[];
+  missingSkills?: string[];
 }

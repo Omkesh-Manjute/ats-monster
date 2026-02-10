@@ -1,4 +1,8 @@
-import * as mammoth from "mammoth";
+import * as pdfjsLib from "pdfjs-dist";
+import mammoth from "mammoth";
+
+// Set up PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
 
 export async function extractText(file: File): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase();
@@ -11,29 +15,24 @@ export async function extractText(file: File): Promise<string> {
     return file.text();
   }
 
-  throw new Error("Unsupported file type: " + ext);
+  return "";
 }
 
 async function extractPdfText(file: File): Promise<string> {
-  const pdfjsLib = await import("pdfjs-dist");
-  
-  // Set worker source
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
-
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
   let fullText = "";
+
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    const strings = content.items
+    const pageText = content.items
       .map((item: unknown) => {
         const textItem = item as { str?: string };
         return textItem.str || "";
       })
       .join(" ");
-    fullText += strings + "\n";
+    fullText += pageText + "\n";
   }
 
   return fullText;
