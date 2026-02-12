@@ -8,6 +8,9 @@ export interface Candidate {
   experience: string;
   location: string;
   content: string;
-  fileName: string;
-  uploadedAt: string;
+  matchScore?: number;
+  matchedSkills?: string[];
+  missingSkills?: string[];
+  matchedPreferred?: string[];
+  missingPreferred?: string[];
 }
